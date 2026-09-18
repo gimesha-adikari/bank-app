@@ -51,10 +51,11 @@ class KycRepositoryImpl @Inject constructor(
         return MultipartBody.Part.createFormData("file", "$name.$ext", body)
     }
 
-    override suspend fun upload(uri: Uri, type: String): UploadedPart {
+    override suspend fun upload(uri: Uri, type: KycUploadType): UploadedPart {
+        val wireType = type.wireValue
         val dto = api.uploadImage(
-            partFromUri(uri, type),
-            type.toRequestBody("text/plain".toMediaType())
+            partFromUri(uri, wireType),
+            wireType.toRequestBody("text/plain".toMediaType())
         )
         return UploadedPart(dto.id)
     }

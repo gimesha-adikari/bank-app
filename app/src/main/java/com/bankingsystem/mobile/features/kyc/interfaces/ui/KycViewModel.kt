@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.bankingsystem.mobile.features.kyc.domain.model.KycCaseStatus
 import com.bankingsystem.mobile.features.kyc.domain.model.KycCheck
 import com.bankingsystem.mobile.features.kyc.domain.model.KycUploadIds
+import com.bankingsystem.mobile.features.kyc.domain.model.KycUploadType
 import com.bankingsystem.mobile.features.kyc.domain.repository.KycRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -27,8 +28,8 @@ class KycViewModel @Inject constructor(
     private val _ui = MutableStateFlow(KycUiState())
     val ui: StateFlow<KycUiState> = _ui.asStateFlow()
 
-    private val _uploadedIds = MutableStateFlow<Map<String, String>>(emptyMap())
-    val uploadedIds: StateFlow<Map<String, String>> = _uploadedIds.asStateFlow()
+    private val _uploadedIds = MutableStateFlow<Map<KycUploadType, String>>(emptyMap())
+    val uploadedIds: StateFlow<Map<KycUploadType, String>> = _uploadedIds.asStateFlow()
 
     private val _uploading = MutableStateFlow(false)
     val uploading: StateFlow<Boolean> = _uploading.asStateFlow()
@@ -95,10 +96,10 @@ class KycViewModel @Inject constructor(
         it.copy(step = s)
     }
 
-    fun setDocFront(uri: Uri?) { _ui.update { it.copy(docFront = uri) }; if (uri != null) upload("DOC_FRONT", uri) }
-    fun setDocBack(uri: Uri?)  { _ui.update { it.copy(docBack = uri)  }; if (uri != null) upload("DOC_BACK", uri)  }
-    fun setSelfie(uri: Uri?)   { _ui.update { it.copy(selfie = uri)   }; if (uri != null) upload("SELFIE", uri)    }
-    fun setAddressProof(uri: Uri?) { _ui.update { it.copy(addressProof = uri) }; if (uri != null) upload("ADDRESS_PROOF", uri) }
+    fun setDocFront(uri: Uri?) { _ui.update { it.copy(docFront = uri) }; if (uri != null) upload(KycUploadType.DOC_FRONT, uri) }
+    fun setDocBack(uri: Uri?)  { _ui.update { it.copy(docBack = uri)  }; if (uri != null) upload(KycUploadType.DOC_BACK, uri)  }
+    fun setSelfie(uri: Uri?)   { _ui.update { it.copy(selfie = uri)   }; if (uri != null) upload(KycUploadType.SELFIE, uri)    }
+    fun setAddressProof(uri: Uri?) { _ui.update { it.copy(addressProof = uri) }; if (uri != null) upload(KycUploadType.ADDRESS_PROOF, uri) }
 
     fun setDocQuality(q: DocQuality) = _ui.update { it.copy(docQuality = q) }
     fun setOcrFields(fields: List<OcrField>) = _ui.update { it.copy(ocrFields = fields) }
@@ -106,7 +107,7 @@ class KycViewModel @Inject constructor(
     fun setFaceMatch(score: Float?) = _ui.update { it.copy(faceMatchScore = score) }
     fun setConsent(accepted: Boolean) = _ui.update { it.copy(consentAccepted = accepted) }
 
-    private fun upload(type: String, uri: Uri) {
+    private fun upload(type: KycUploadType, uri: Uri) {
         viewModelScope.launch {
             _uploading.value = true
             runCatching { repo.upload(uri, type) }
@@ -156,7 +157,7 @@ class KycViewModel @Inject constructor(
             return false
         }
         val idsMap = uploadedIds.value
-        val missing = listOf("DOC_FRONT","DOC_BACK","SELFIE","ADDRESS_PROOF").filterNot { it in idsMap }
+        val missing = KycUploadType.entries.filterNot { it in idsMap }
         if (missing.isNotEmpty()) {
             Log.w("KYC", "submit(): missing upload ids: $missing")
             return false
@@ -164,10 +165,10 @@ class KycViewModel @Inject constructor(
 
         return try {
             val ids = KycUploadIds(
-                docFrontId = idsMap.getValue("DOC_FRONT"),
-                docBackId  = idsMap.getValue("DOC_BACK"),
-                selfieId   = idsMap.getValue("SELFIE"),
-                addressId  = idsMap.getValue("ADDRESS_PROOF")
+                docFrontId = idsMap.getValue(KycUploadType.DOC_FRONT),
+                docBackId  = idsMap.getValue(KycUploadType.DOC_BACK),
+                selfieId   = idsMap.getValue(KycUploadType.SELFIE),
+                addressId  = idsMap.getValue(KycUploadType.ADDRESS_PROOF)
             )
             val result = repo.submit(consent = ui.value.consentAccepted, ids = ids)
             val okStatuses = setOf("PENDING","AUTO_REVIEW","UNDER_REVIEW","APPROVED","REJECTED","NEEDS_MORE_INFO")

@@ -6,9 +6,24 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
+fun String.asBuildConfigString(): String =
+    "\"${replace("\\", "\\\\").replace("\"", "\\\"")}\""
+
+val apiBaseUrl = providers.gradleProperty("API_BASE_URL")
+    .orElse("http://10.0.2.2:8080/")
+    .get()
+val supportEmail = providers.gradleProperty("SUPPORT_EMAIL")
+    .orElse("support@example.test")
+    .get()
+val enableLogging = providers.gradleProperty("ENABLE_LOGGING")
+    .orElse("false")
+    .get()
+
 android {
     namespace = "com.bankingsystem.mobile"
     compileSdk = 36
+    compileSdkExtension = 20
+    buildToolsVersion = "36.1.0"
 
     defaultConfig {
         applicationId = "com.bankingsystem.mobile"
@@ -18,9 +33,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "API_BASE_URL", "\"https://api.gimesha.dev/\"")
-        buildConfigField("String", "SUPPORT_EMAIL", "\"support@bankapp.com\"")
-        buildConfigField("boolean", "ENABLE_LOGGING", "true")
+        buildConfigField("String", "API_BASE_URL", apiBaseUrl.asBuildConfigString())
+        buildConfigField("String", "SUPPORT_EMAIL", supportEmail.asBuildConfigString())
+        buildConfigField("boolean", "ENABLE_LOGGING", enableLogging)
     }
 
     buildTypes {

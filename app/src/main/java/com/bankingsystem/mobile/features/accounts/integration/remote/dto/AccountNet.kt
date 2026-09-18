@@ -10,21 +10,21 @@ data class AccountNet(
     @SerializedName("balance")        val balance: Double,
 
     @SerializedName("branchName")     val branchName: String? = null,
-    @SerializedName("branchId")       val branchId: String? = null,
+    @SerializedName("branchId")       val branchId: Int? = null,
 
     @SerializedName("createdAt")      val createdAt: String? = null,
     @SerializedName("updatedAt")      val updatedAt: String? = null
 )
 
 data class BranchNet(
-    val branchId: String,
+    val branchId: Int,
     val branchName: String
 )
 
 data class AccountOpenRequest(
     val accountType: String,
     val initialDeposit: Double,
-    val branchId: String
+    val branchId: Int
 )
 
 data class AccountResponseNet(
@@ -42,5 +42,5 @@ data class TransactionNet(
     val amount: Double,
     val balanceAfter: Double,
     val description: String?,
-    val createdAt: List<Int>
+    val createdAt: String?
 )

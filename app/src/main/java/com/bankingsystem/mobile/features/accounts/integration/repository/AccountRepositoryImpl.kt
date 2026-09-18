@@ -16,7 +16,7 @@ class AccountRepositoryImpl @Inject constructor(
 ) : AccountRepository {
 
     override suspend fun getBranches(): List<Branch> = ioWrap {
-        api.getBranches().map { Branch(it.branchId, it.branchName) }
+        api.getBranches().map { Branch(it.branchId.toString(), it.branchName) }
     }
 
     override suspend fun openAccount(
@@ -28,7 +28,8 @@ class AccountRepositoryImpl @Inject constructor(
             com.bankingsystem.mobile.features.accounts.integration.remote.dto.AccountOpenRequest(
                 accountType = accountType,
                 initialDeposit = initialDeposit,
-                branchId = branchId
+                branchId = branchId.toIntOrNull()
+                    ?: throw ApiCallException("Invalid branch ID: $branchId")
             )
         )
         Account(

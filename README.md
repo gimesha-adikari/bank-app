@@ -18,6 +18,11 @@ BankApp is a Kotlin-based Android project for retail-banking use cases, providin
 
 ## How to Run the Project
 
+The revived BankingSystem copy uses the local-development API URL by default
+(`http://10.0.2.2:8080/` for an Android emulator). Override it with
+`-PAPI_BASE_URL=...` for a physical device or another host. The Gradle project
+targets Android API 36 extension 20 and Build Tools 36.1.0.
+
 ### 1. Clone the repo
 ```bash
 git clone https://github.com/gimesha-adikari/BankApp.git
@@ -32,7 +37,8 @@ cd BankApp
 ### 3. Build & Run
 - Click **Run ▶** in Android Studio, or run from CLI:
 ```bash
-./gradlew assembleDebug
+ANDROID_HOME=/path/to/android-sdk ANDROID_SDK_ROOT=/path/to/android-sdk \\
+  bash ./gradlew assembleDebug -PAPI_BASE_URL=http://10.0.2.2:8080/
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 

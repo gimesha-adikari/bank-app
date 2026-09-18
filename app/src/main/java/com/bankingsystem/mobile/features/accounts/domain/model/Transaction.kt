@@ -7,5 +7,5 @@ data class Transaction(
     val amount: Double,
     val balanceAfter: Double,
     val description: String?,
-    val createdAt: List<Int>
+    val createdAt: String?
 )

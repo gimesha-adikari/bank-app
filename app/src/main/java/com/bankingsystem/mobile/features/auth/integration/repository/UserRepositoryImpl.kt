@@ -6,6 +6,7 @@ import com.bankingsystem.mobile.features.auth.domain.repository.UserRepository
 import com.bankingsystem.mobile.features.auth.integration.remote.api.AuthApi
 import com.bankingsystem.mobile.features.auth.integration.remote.dto.LoginRequest
 import com.bankingsystem.mobile.features.auth.integration.remote.dto.LoginResponse
+import com.bankingsystem.mobile.features.auth.integration.remote.dto.ForgotPasswordRequest
 import com.bankingsystem.mobile.features.auth.integration.remote.dto.RegisterRequest
 import kotlinx.coroutines.flow.Flow
 import retrofit2.HttpException
@@ -58,7 +59,7 @@ class UserRepositoryImpl @Inject constructor(
     } catch (_: Exception) { false }
 
     override suspend fun forgotPassword(email: String): Boolean = try {
-        api.forgotPassword(email).isSuccessful
+        api.forgotPassword(ForgotPasswordRequest(email)).isSuccessful
     } catch (_: Exception) { false }
 
     override suspend fun validateToken(): Result<ValidateTokenResponse> = try {

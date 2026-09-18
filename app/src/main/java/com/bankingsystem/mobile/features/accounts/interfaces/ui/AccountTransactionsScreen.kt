@@ -142,25 +142,14 @@ private fun SkeletonRow() {
     }
 }
 
-private fun humanDate(parts: List<Int>): String {
-    val y  = parts.getOrNull(0) ?: return "—"
-    val mo = (parts.getOrNull(1) ?: 1) - 1
-    val d  = parts.getOrNull(2) ?: 1
-    val h  = parts.getOrNull(3) ?: 0
-    val m  = parts.getOrNull(4) ?: 0
-    val s  = parts.getOrNull(5) ?: 0
-
-    val cal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault()).apply {
-        set(Calendar.YEAR, y)
-        set(Calendar.MONTH, mo)
-        set(Calendar.DAY_OF_MONTH, d)
-        set(Calendar.HOUR_OF_DAY, h)
-        set(Calendar.MINUTE, m)
-        set(Calendar.SECOND, s)
-        set(Calendar.MILLISECOND, 0)
-    }
-    val out = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-    return out.format(cal.time)
+private fun humanDate(value: String?): String {
+    if (value.isNullOrBlank()) return "—"
+    val parsed = runCatching {
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+        }.parse(value)
+    }.getOrNull() ?: return value
+    return SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(parsed)
 }
 
 private fun formatAmount(v: Double): String =
