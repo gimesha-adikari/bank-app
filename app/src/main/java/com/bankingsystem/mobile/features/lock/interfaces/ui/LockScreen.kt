@@ -10,7 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
+import androidx.activity.compose.LocalActivity
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import com.bankingsystem.mobile.core.modules.common.designsystem.FadingAppBackground
@@ -21,13 +21,13 @@ fun LockScreen(
     onAuthenticated: () -> Unit,
     onFallbackToPin: () -> Unit
 ) {
-    val activity = (LocalContext.current as? FragmentActivity)
+    val activity = LocalActivity.current
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(Unit) {
-        activity?.let {
+    LaunchedEffect(activity) {
+        if (activity is FragmentActivity) {
             showBiometricPrompt(
-                activity = it,
+                activity = activity,
                 onSuccess = { onAuthenticated() },
                 onFailure = {
                     errorMessage = "Biometric failed. Try PIN."
@@ -38,6 +38,9 @@ fun LockScreen(
                     onFallbackToPin()
                 }
             )
+        } else {
+            errorMessage = "Biometric authentication is unavailable. Try PIN."
+            onFallbackToPin()
         }
     }
 
