@@ -9,7 +9,10 @@ plugins {
 fun String.asBuildConfigString(): String =
     "\"${replace("\\", "\\\\").replace("\"", "\\\"")}\""
 
-val apiBaseUrl = providers.gradleProperty("API_BASE_URL")
+val configuredApiBaseUrl = providers.gradleProperty("API_BASE_URL")
+    .orElse("https://api.example.invalid/")
+    .get()
+val debugApiBaseUrl = providers.gradleProperty("API_BASE_URL")
     .orElse("http://10.0.2.2:8080/")
     .get()
 val supportEmail = providers.gradleProperty("SUPPORT_EMAIL")
@@ -33,12 +36,17 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "API_BASE_URL", apiBaseUrl.asBuildConfigString())
+        // Release builds must receive a real endpoint through -PAPI_BASE_URL;
+        // the placeholder prevents an emulator-only host from shipping by default.
+        buildConfigField("String", "API_BASE_URL", configuredApiBaseUrl.asBuildConfigString())
         buildConfigField("String", "SUPPORT_EMAIL", supportEmail.asBuildConfigString())
         buildConfigField("boolean", "ENABLE_LOGGING", enableLogging)
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "API_BASE_URL", debugApiBaseUrl.asBuildConfigString())
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
