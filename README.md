@@ -1,10 +1,11 @@
 ![Project cover](cover.png)
 
-# BankApp – Android Banking Application
+# bank-app – Android Banking Application
 #### Video Demo: (coming soon)
 
 ## Description
-BankApp is a Kotlin-based Android project for retail-banking use cases, providing a clean Gradle setup and modular structure to accelerate feature development, promote maintainability, and support production-ready expansion.
+bank-app is the Kotlin-based Android client for the Banking Platform, providing
+a clean Gradle setup and modular structure for retail-banking use cases.
 
 ---
 
@@ -18,15 +19,15 @@ BankApp is a Kotlin-based Android project for retail-banking use cases, providin
 
 ## How to Run the Project
 
-The revived BankingSystem copy uses the local-development API URL by default
+The bank-core backend uses the local-development API URL by default
 (`http://10.0.2.2:8080/` for an Android emulator). Override it with
 `-PAPI_BASE_URL=...` for a physical device or another host. The Gradle project
 targets Android API 36 extension 20 and Build Tools 36.1.0.
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/gimesha-adikari/BankApp.git
-cd BankApp
+git clone https://github.com/gimesha-adikari/bank-app.git
+cd bank-app
 ```
 
 ### 2. Open in Android Studio
