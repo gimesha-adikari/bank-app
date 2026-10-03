@@ -19,10 +19,21 @@ a clean Gradle setup and modular structure for retail-banking use cases.
 
 ## How to Run the Project
 
-The bank-core backend uses the local-development API URL by default
-(`http://10.0.2.2:8080/` for an Android emulator). Override it with
-`-PAPI_BASE_URL=...` for a physical device or another host. The Gradle project
-targets Android API 36 extension 20 and Build Tools 36.1.0.
+The debug build uses `http://10.0.2.2:8080/` by default for Android emulator
+development. Debug HTTP is permitted only for the exact host `10.0.2.2`.
+Physical-device and other custom development endpoints should use HTTPS with
+`-PAPI_BASE_URL=...`. Release builds require an absolute HTTPS API base URL;
+the current `https://api.example.invalid/` default is a syntax-safe placeholder,
+not a reachable service.
+
+Android app-private data is intentionally excluded from cloud backup and
+standard device transfer. A restored or new device requires sign-in again, and
+local app-lock and default-account preferences must be set up again. Bank-core
+account and transaction data remains server-side and is available after
+authentication. Android OEM migration tools may have behavior outside the
+standard backup-rule contract.
+
+The Gradle project targets Android API 36 extension 20 and Build Tools 36.1.0.
 
 ### 1. Clone the repo
 ```bash
