@@ -1,3 +1,6 @@
+import java.net.URI
+import org.gradle.api.GradleException
+
 plugins {
     alias(libs.plugins.android.application)  // com.android.application
     alias(libs.plugins.kotlin.android)       // org.jetbrains.kotlin.android
@@ -21,6 +24,31 @@ val supportEmail = providers.gradleProperty("SUPPORT_EMAIL")
 val enableLogging = providers.gradleProperty("ENABLE_LOGGING")
     .orElse("false")
     .get()
+
+fun validateReleaseApiBaseUrlValue(value: String) {
+    val uri = try {
+        URI(value)
+    } catch (_: Exception) {
+        throw GradleException("Release API_BASE_URL must be an absolute HTTPS Retrofit base URL with a host, no user-info, and a trailing slash.")
+    }
+    val validPort = uri.port == -1 || uri.port in 1..65535
+    val valid = uri.isAbsolute &&
+        uri.scheme.equals("https", ignoreCase = true) &&
+        !uri.host.isNullOrBlank() &&
+        uri.rawUserInfo == null &&
+        uri.rawPath.endsWith("/") &&
+        validPort
+    if (!valid) {
+        throw GradleException("Release API_BASE_URL must be an absolute HTTPS Retrofit base URL with a host, no user-info, and a trailing slash.")
+    }
+}
+
+val validateReleaseApiBaseUrlTask = tasks.register("validateReleaseApiBaseUrl") {
+    group = "verification"
+    doLast {
+        validateReleaseApiBaseUrlValue(configuredApiBaseUrl)
+    }
+}
 
 android {
     namespace = "com.bankingsystem.mobile"
@@ -67,6 +95,12 @@ android {
     }
     kotlinOptions {
         freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+    }
+}
+
+tasks.configureEach {
+    if (name == "preReleaseBuild") {
+        dependsOn(validateReleaseApiBaseUrlTask)
     }
 }
 
